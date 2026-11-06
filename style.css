@@ -258,6 +258,9 @@ main > section.active {
 .col-title { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.8rem; font-size: 1.8rem; font-weight: 600; }
 .col-title i { color: var(--main); font-size: 2.4rem; }
 .stack { display: grid; gap: 1.6rem; }
+.stack .card h3 {
+    color: var(--light);
+}
 
 /* Timeline */
 .timeline { display: grid; gap: 1.6rem; padding-left: 2.6rem; border-left: 2px solid rgba(229, 9, 53, .4); }
