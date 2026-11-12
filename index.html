@@ -13,13 +13,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="upgrade.css">
     <script src="script.js" defer></script>
+    <script src="upgrade.js" defer></script>
 </head>
-<body>
+<body data-page="home">
     <canvas id="particles-bg" aria-hidden="true"></canvas>
 
     <header class="header">
-        <a href="#home" class="logo">ROLE<span>Ⓧ</span></a>
+        <div class="header-left">
+            <a href="#home" class="back-home" aria-label="Back to home"><i class="bx bx-left-arrow-alt"></i><span>Back to Home</span></a>
+            <a href="#home" class="logo">ROLE<span>Ⓧ</span></a>
+        </div>
 
         <button class="menu-toggle" id="menu-icon" aria-label="Open navigation menu"
                 aria-expanded="false" aria-controls="navbar">
@@ -29,7 +34,8 @@
         <nav class="navbar" id="navbar">
             <a href="#home" class="active">Home</a>
             <a href="#Personal-information">Personal Information</a>
-            
+            <a href="#achievements">Achievements</a>
+            <a href="#my-family">My Family</a>
         </nav>
     </header>
 
@@ -55,13 +61,11 @@
                     <a href="https://www.facebook.com/share/1KS4kh4XMm/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bx bxl-facebook"></i></a>
                     <a href="https://www.instagram.com/jrenzyy_/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bx bxl-instagram"></i></a>
                     <a href="https://github.com/Jarrenrole" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="bx bxl-github"></i></a>
-                    <!-- TODO: put your LinkedIn URL here -->
                     <a href="https://www.linkedin.com/in/jarren-gordovez-role-04437b449/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="bx bxl-linkedin"></i></a>
                 </div>
 
                 <div class="home-buttons">
-                    <a href="#about-me" class="btn">Explore more <i class="bx bx-right-arrow-alt"></i></a>
-                    <!-- TODO: replace with your real email -->
+                    <a href="#Personal-information" class="btn">Explore more <i class="bx bx-right-arrow-alt"></i></a>
                     <a href="mailto:Jarregordovezrole@gmail.com" class="btn btn-outline">Contact me <i class="bx bx-envelope"></i></a>
                 </div>
             </div>
@@ -76,7 +80,7 @@
             </div>
         </section>
 
-        <!-- Personal Information-->
+        <!-- PERSONAL INFORMATION -->
         <section class="page" id="Personal-information">
             <div class="page-inner">
                 <p class="label">Get to know me</p>
@@ -85,44 +89,158 @@
                    Hi, I'm Jarren Role, an IT student at the University of the Cordilleras with a passion for web development and creativity. I enjoy turning ideas into functional, visually appealing websites while continuously learning, improving my skills, and working toward becoming a skilled web developer.
                 </p>
 
-                <div class="two-col">
-                    <div>
-                        <h3 class="col-title"><i class="bx bx-book-reader"></i>Personal Information</h3>
-                        <div class="timeline">
-                            <article class="card tl-item">
-                                <span class="tl-year">Birthday</span>
-                                <h3>January 28, 2008</h3>
-                                <p></p>
+                <div class="info-grid">
+                    <article class="card tile"><i class="bx bx-cake"></i><div><small>Birthday</small><b>January 28, 2008</b></div></article>
+                    <article class="card tile"><i class="bx bx-user"></i><div><small>Age</small><b>18</b></div></article>
+                    <article class="card tile"><i class="bx bx-laptop"></i><div><small>Course</small><b>BS Information Technology</b></div></article>
+                    <article class="card tile half"><i class="bx bx-map"></i><div><small>Address</small><b>New Lucban Baguio, Benguet</b></div></article>
+                    <article class="card tile half"><i class="bx bx-building"></i><div><small>School</small><b>University Of The Cordilleras</b></div></article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACHIEVEMENTS -->
+        <section class="page" id="achievements">
+            <div class="page-inner">
+                <p class="label">Proud moments</p>
+                <h2>My <span>Achievements</span></h2>
+                <p class="intro">Graduations, immersion and academic honors, each backed by photo proof. Tap a photo to view it larger.</p>
+
+                <div class="ach-tabs" role="tablist" aria-label="Achievement categories">
+                    <button class="ach-tab active" role="tab" aria-selected="true" data-panel="p-grad"><i class="bx bx-graduation"></i>Graduation <em>3</em></button>
+                    <button class="ach-tab" role="tab" aria-selected="false" data-panel="p-imm"><i class="bx bx-briefcase-alt-2"></i>Immersion <em>1</em></button>
+                    <button class="ach-tab" role="tab" aria-selected="false" data-panel="p-aw"><i class="bx bx-medal"></i>Academic Awards <em>3</em></button>
+                </div>
+
+                <div class="ach-panels">
+
+                    <!-- GRADUATION -->
+                    <div class="ach-panel" id="p-grad" role="tabpanel">
+                        <div class="ach-grid">
+                            <article class="card ach-card">
+                                <button class="proof" type="button" data-caption="Senior High School Graduation" aria-label="View photo proof: Senior High School Graduation">
+                                    <img src="assets/grade12.jpg" alt="Photo proof of Senior High School Graduation">
+                                    <span class="placeholder"><i class="bx bx-image-add"></i><b>Add photo proof</b><small>assets/achievements/graduation-senior.jpg</small></span>
+                                    <span class="ach-icon"><i class="bx bx-graduation"></i></span>
+                                    <span class="zoom"><i class="bx bx-expand-alt"></i></span>
+                                    <span class="proof-badge"><i class="bx bx-check-shield"></i>Photo proof</span>
+                                </button>
+                                <div class="ach-body">
+                                    <span class="ach-tag">Graduation</span>
+                                    <h3>Senior High School Graduation</h3>
+                                    <p>Completed Senior High School, the foundation of my journey into IT.</p>
+                                    <span class="chip">Class Of 2026</span>
+                                </div>
                             </article>
-                            <article class="card tl-item">
-                                <span class="tl-year">Age</span>
-                                <h3>18</h3>
-                                <p></p>
+
+                            <article class="card ach-card">
+                                <button class="proof" type="button" data-caption="Junior High School Graduation" aria-label="View photo proof: Junior High School Graduation">
+                                    <img src="assets/grade10.jpg" alt="Photo proof of Junior High School Graduation">
+                                    <span class="placeholder"><i class="bx bx-image-add"></i><b>Add photo proof</b><small>assets/achievements/graduation-junior.jpg</small></span>
+                                    <span class="ach-icon"><i class="bx bx-graduation"></i></span>
+                                    <span class="zoom"><i class="bx bx-expand-alt"></i></span>
+                                    <span class="proof-badge"><i class="bx bx-check-shield"></i>Photo proof</span>
+                                </button>
+                                <div class="ach-body">
+                                    <span class="ach-tag">Graduation</span>
+                                    <h3>Junior High School Graduation</h3>
+                                    <p>Completed Junior High School and moved on to the next chapter.</p>
+                                    <span class="chip">Class Of 2024</span>
+                                </div>
                             </article>
-                            <article class="card tl-item">
-                                <span class="tl-year">Address</span>
-                                <h3>New Lucban Baguio, Benguet</h3>
-                                <p></p>
+
+                            <article class="card ach-card">
+                                <button class="proof" type="button" data-caption="Grade 6 Graduation" aria-label="View photo proof: Grade 6 Graduation">
+                                    <img src="assets/grade6.jpg" alt="Photo proof of Grade 6 Graduation">
+                                    <span class="placeholder"><i class="bx bx-image-add"></i><b>Add photo proof</b><small>assets/achievements/graduation-grade6.jpg</small></span>
+                                    <span class="ach-icon"><i class="bx bx-graduation"></i></span>
+                                    <span class="zoom"><i class="bx bx-expand-alt"></i></span>
+                                    <span class="proof-badge"><i class="bx bx-check-shield"></i>Photo proof</span>
+                                </button>
+                                <div class="ach-body">
+                                    <span class="ach-tag">Graduation</span>
+                                    <h3>Grade 6 Graduation</h3>
+                                    <p>Finished elementary, where my learning journey began.</p>
+                                    <span class="chip">Class Of 2020</span>
+                                </div>
                             </article>
-                              <article class="card tl-item">
-                                <span class="tl-year">Course</span>
-                                <h3>BS Information Technology</h3>
-                              </article>
-                              <article class="card tl-item">
-                                <span class="tl-year">School</span>
-                                <h3>University Of The Cordilleras</h3>
-                              </article>
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="col-title"><i class="bx bx-trophy"></i>Technical Skills</h3>
-                        <div class="stack">
-                           <article class="card"><h3 style="color: #FF294F;">Java</h3><p>Currently Learning.</p></article>
-<article class="card"><h3 style="color: #FF294F;">Python</h3><p>Currently Learning.</p></article>
-<article class="card"><h3 style="color: #FF294F;">HTML</h3><p>Currently Learning.</p></article>
+                    <!-- IMMERSION -->
+                    <div class="ach-panel" id="p-imm" role="tabpanel" hidden>
+                        <div class="ach-grid single">
+                            <article class="card ach-card">
+                                <button class="proof" type="button" data-caption="Work Immersion Experience" aria-label="View photo proof: Work Immersion Experience">
+                                    <img src="immersion.jpg" alt="Photo proof of Work Immersion Experience">
+                                    <span class="placeholder"><i class="bx bx-image-add"></i><b>Add photo proof</b><small>assets/achievements/immersion.jpg</small></span>
+                                    <span class="ach-icon"><i class="bx bx-briefcase-alt-2"></i></span>
+                                    <span class="zoom"><i class="bx bx-expand-alt"></i></span>
+                                    <span class="proof-badge"><i class="bx bx-check-shield"></i>Photo proof</span>
+                                </button>
+                                <div class="ach-body">
+                                    <span class="ach-tag">Work Immersion</span>
+                                    <h3>Work Immersion Experience</h3>
+                                    <p>Hands-on immersion where I applied what I learned in a real work environment.</p>
+                                    <span class="chip">2026</span>
+                                </div>
+                            </article>
                         </div>
                     </div>
+
+                    <!-- ACADEMIC AWARDS -->
+                    <div class="ach-panel" id="p-aw" role="tabpanel" hidden>
+                        <div class="ach-grid">
+                            <article class="card ach-card">
+                                <button class="proof" type="button" data-caption="With Honors, Academic Award 1" aria-label="View photo proof: With Honors, Academic Award 1">
+                                    <img src="grade7.jpg" alt="Photo proof of With Honors, Academic Award 1">
+                                    <span class="placeholder"><i class="bx bx-image-add"></i><b>Add photo proof</b><small>assets/achievements/honors-1.jpg</small></span>
+                                    <span class="ach-icon"><i class="bx bx-medal"></i></span>
+                                    <span class="zoom"><i class="bx bx-expand-alt"></i></span>
+                                    <span class="proof-badge"><i class="bx bx-check-shield"></i>Photo proof</span>
+                                </button>
+                                <div class="ach-body">
+                                    <span class="ach-tag">Academic Award</span>
+                                    <h3>Grade 7 With Honors</h3>
+                                    <p>Recognized for outstanding academic performance.</p>
+                                    <span class="chip">2021-2022</span>
+                                </div>
+                            </article>
+
+                            <article class="card ach-card">
+                                <button class="proof" type="button" data-caption="With Honors, Academic Award 2" aria-label="View photo proof: With Honors, Academic Award 2">
+                                    <img src="grade8.jpg" alt="Photo proof of With Honors, Academic Award 2">
+                                    <span class="placeholder"><i class="bx bx-image-add"></i><b>Add photo proof</b><small>assets/achievements/honors-2.jpg</small></span>
+                                    <span class="ach-icon"><i class="bx bx-medal"></i></span>
+                                    <span class="zoom"><i class="bx bx-expand-alt"></i></span>
+                                    <span class="proof-badge"><i class="bx bx-check-shield"></i>Photo proof</span>
+                                </button>
+                                <div class="ach-body">
+                                    <span class="ach-tag">Academic Award</span>
+                                    <h3>Grade 8 With Honors</h3>
+                                    <p>Recognized for outstanding academic performance.</p>
+                                    <span class="chip">2022-2023</span>
+                                </div>
+                            </article>
+
+                            <article class="card ach-card">
+                                <button class="proof" type="button" data-caption="With Honors, Academic Award 3" aria-label="View photo proof: With Honors, Academic Award 3">
+                                    <img src="Grade11.jpg" alt="Photo proof of With Honors, Academic Award 3">
+                                    <span class="placeholder"><i class="bx bx-image-add"></i><b>Add photo proof</b><small>assets/achievements/honors-3.jpg</small></span>
+                                    <span class="ach-icon"><i class="bx bx-medal"></i></span>
+                                    <span class="zoom"><i class="bx bx-expand-alt"></i></span>
+                                    <span class="proof-badge"><i class="bx bx-check-shield"></i>Photo proof</span>
+                                </button>
+                                <div class="ach-body">
+                                    <span class="ach-tag">Academic Award</span>
+                                    <h3>Grade 11 With Honors</h3>
+                                    <p>Recognized for outstanding academic performance.</p>
+                                    <span class="chip">2023-2024</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -135,29 +253,9 @@
                 <p class="intro">The people who support me every step of the way.</p>
 
                 <div class="grid">
-                    <article class="card"><i class="bx bx-user"></i><h3>Father's name</h3><p>A line about him.</p></article>
-                    <article class="card"><i class="bx bx-user"></i><h3>Mother's name</h3><p>A line about her.</p></article>
-                    <article class="card"><i class="bx bx-group"></i><h3>Siblings</h3><p>Names and a short note.</p></article>
-                </div>
-            </div>
-        </section>
-
-        <!-- PROJECTS -->
-        <section class="page" id="projects">
-            <div class="page-inner">
-                <p class="label">What I've built</p>
-                <h2>My <span>Projects</span></h2>
-                <p class="intro">A few things I've made while learning.</p>
-
-                <div class="grid">
-                    <article class="card">
-                        <i class="bx bx-code-block"></i>
-                        <h3>Personal Portfolio</h3>
-                        <p>This site, built with HTML, CSS and JavaScript.</p>
-                        <a class="card-link" href="https://github.com/Jarrenrole" target="_blank" rel="noopener noreferrer">View on GitHub <i class="bx bx-link-external"></i></a>
-                    </article>
-                    <article class="card"><i class="bx bx-folder"></i><h3>Project name</h3><p>What it does and the tools you used.</p></article>
-                    <article class="card"><i class="bx bx-folder"></i><h3>Project name</h3><p>What it does and the tools you used.</p></article>
+                    <article class="card member"><div class="avatar"><i class="bx bx-user"></i></div><h3>Father's name</h3><span class="chip">Father</span><p>A line about him.</p></article>
+                    <article class="card member"><div class="avatar"><i class="bx bx-user"></i></div><h3>Mother's name</h3><span class="chip">Mother</span><p>A line about her.</p></article>
+                    <article class="card member"><div class="avatar"><i class="bx bx-group"></i></div><h3>Siblings</h3><span class="chip">Brothers &amp; sisters</span><p>Names and a short note.</p></article>
                 </div>
             </div>
         </section>
@@ -165,7 +263,13 @@
 
     <footer class="footer">
         <p>© <span id="year"></span> Jarren Role. All rights reserved.</p>
-        <a href="#home" aria-label="Back to home"><i class="bx bx-up-arrow-alt"></i></a>
     </footer>
+
+    <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="Photo proof viewer">
+        <button class="lb-btn lb-close" aria-label="Close"><i class="bx bx-x"></i></button>
+        <button class="lb-btn lb-prev" aria-label="Previous photo"><i class="bx bx-chevron-left"></i></button>
+        <figure><img src="" alt=""><figcaption></figcaption></figure>
+        <button class="lb-btn lb-next" aria-label="Next photo"><i class="bx bx-chevron-right"></i></button>
+    </div>
 </body>
 </html>
