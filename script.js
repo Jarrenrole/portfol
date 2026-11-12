@@ -44,6 +44,9 @@ function showSection(id, updateURL = true) {
         active ? link.setAttribute("aria-current", "page") : link.removeAttribute("aria-current");
     });
 
+    // Show "Back to Home" everywhere except on Home
+    document.body.dataset.page = id;
+
     setMenu(false);
     target.scrollTop = 0;
     document.title = `${id === "home" ? "Jarren Role" : target.querySelector("h2")?.textContent} | Portfolio`;
@@ -153,20 +156,17 @@ if (canvas) {
 
     function draw() {
         ctx.clearRect(0, 0, w, h);
-                // Very small red glow following the cursor
-if (mouse.x >= 0 && mouse.y >= 0) {
-    const glow = ctx.createRadialGradient(
-        mouse.x, mouse.y, 0,
-        mouse.x, mouse.y, 20
-    );
 
-    glow.addColorStop(0, "rgba(229, 9, 53, 0.20)");
-    glow.addColorStop(0.5, "rgba(229, 9, 53, 0.07)");
-    glow.addColorStop(1, "rgba(229, 9, 53, 0)");
+        // Very small red glow following the cursor
+        if (mouse.x >= 0 && mouse.y >= 0) {
+            const glow = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 20);
+            glow.addColorStop(0, "rgba(229, 9, 53, 0.20)");
+            glow.addColorStop(0.5, "rgba(229, 9, 53, 0.07)");
+            glow.addColorStop(1, "rgba(229, 9, 53, 0)");
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, w, h);
+        }
 
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, w, h);
-}
         for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
@@ -240,3 +240,74 @@ if (mouse.x >= 0 && mouse.y >= 0) {
 /* ===== 6. FOOTER YEAR ===== */
 const yearEl = document.querySelector("#year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+/* ===== 7. ACHIEVEMENTS: TABS + PHOTO PROOF VIEWER ===== */
+(() => {
+    /* Achievement tabs */
+    const tabs = [...document.querySelectorAll(".ach-tab")];
+    const panels = [...document.querySelectorAll(".ach-panel")];
+    tabs.forEach(tab => tab.addEventListener("click", () => {
+        tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle("active", on);
+            t.setAttribute("aria-selected", String(on));
+        });
+        panels.forEach(p => { p.hidden = p.id !== tab.dataset.panel; p.scrollTop = 0; });
+    }));
+
+    /* Missing photo -> show "Add photo proof" placeholder */
+    document.querySelectorAll(".proof img").forEach(img => {
+        const fail = () => img.closest(".proof").classList.add("no-photo");
+        if (img.complete && img.naturalWidth === 0) fail();
+        else img.addEventListener("error", fail, { once: true });
+    });
+
+    /* Lightbox */
+    const lb = document.getElementById("lightbox");
+    const lbImg = lb.querySelector("img");
+    const lbCap = lb.querySelector("figcaption");
+    let list = [], idx = 0, lastFocus = null;
+
+    const render = () => {
+        const p = list[idx];
+        lbImg.src = p.querySelector("img").src;
+        lbImg.alt = p.querySelector("img").alt;
+        lbCap.textContent = p.dataset.caption || "";
+    };
+    const open = p => {
+        list = [...p.closest(".ach-panel").querySelectorAll(".proof:not(.no-photo)")];
+        idx = list.indexOf(p);
+        lastFocus = document.activeElement;
+        lb.classList.toggle("single", list.length < 2);
+        render();
+        lb.classList.add("open");
+        lb.setAttribute("aria-hidden", "false");
+        lb.querySelector(".lb-close").focus();
+    };
+    const close = () => {
+        lb.classList.remove("open");
+        lb.setAttribute("aria-hidden", "true");
+        lastFocus && lastFocus.focus();
+    };
+    const step = d => { idx = (idx + d + list.length) % list.length; render(); };
+
+    document.querySelectorAll(".proof").forEach(p => p.addEventListener("click", () => {
+        if (!p.classList.contains("no-photo")) open(p);
+    }));
+
+    lb.addEventListener("click", e => {
+        if (e.target.closest(".lb-close") || e.target === lb) close();
+        else if (e.target.closest(".lb-prev")) step(-1);
+        else if (e.target.closest(".lb-next")) step(1);
+    });
+
+    // capture phase: stops the page-switching arrow keys while the viewer is open
+    window.addEventListener("keydown", e => {
+        if (!lb.classList.contains("open")) return;
+        if (e.key === "Escape") close();
+        else if (e.key === "ArrowRight" && list.length > 1) step(1);
+        else if (e.key === "ArrowLeft" && list.length > 1) step(-1);
+        else return;
+        e.stopImmediatePropagation();
+    }, true);
+})();
