@@ -607,3 +607,110 @@ main > section.active {
         font-size: 1rem;
     }
 }
+
+/* ===== ACHIEVEMENTS: EDUCATIONAL ATTAINMENT (fills the empty 8th grid cell) ===== */
+
+#achievements .edu-card {
+    contain: size;            /* does not push the row taller, so the achievement cards keep their size */
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 1.4rem 1.2rem;
+}
+
+#achievements .edu-title {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+#achievements .edu-title i {
+    color: var(--main);
+    font-size: 2.1rem;
+}
+
+#achievements .edu-list {
+    list-style: none;
+    flex: 1;
+    min-height: 0;
+    margin: .9rem 0 0 .5rem;
+    padding-left: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-left: 2px solid rgba(229, 9, 53, .45);
+}
+
+#achievements .edu-list li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+#achievements .edu-list li::before {
+    content: "";
+    position: absolute;
+    left: -1.9rem;
+    top: .45rem;
+    width: .9rem;
+    height: .9rem;
+    border-radius: 50%;
+    background: var(--main);
+    box-shadow: 0 0 10px rgba(229, 9, 53, .7);
+}
+
+#achievements .edu-level {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+#achievements .edu-years {
+    margin-left: .5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--light);
+}
+
+#achievements .edu-school {
+    font-size: 1.05rem;
+    color: var(--muted);
+}
+
+/* Grade 10 is shown as a small branch under Junior High */
+#achievements .edu-list li.edu-sub { padding-left: .2rem; }
+#achievements .edu-list li.edu-sub::before {
+    width: .7rem;
+    height: .7rem;
+    left: -1.8rem;
+    top: .5rem;
+    background: transparent;
+    border: 2px solid var(--main);
+    box-shadow: none;
+}
+#achievements .edu-list li.edu-sub .edu-level { font-size: 1.05rem; font-weight: 500; }
+
+/* Tablet / mobile: 2-column grid, let it size naturally and stay compact */
+@media (max-width: 1000px) {
+    #achievements .edu-card { contain: none; padding: .9rem 1rem; }
+    #achievements .edu-title { font-size: 1.2rem; }
+    #achievements .edu-title i { font-size: 1.8rem; }
+    #achievements .edu-list { margin-top: .6rem; gap: .5rem; }
+}
+
+@media (max-width: 600px) {
+    #achievements .edu-card { padding: .6rem .8rem; }
+    #achievements .edu-title { font-size: 1.05rem; }
+    #achievements .edu-title i { display: none; }
+    #achievements .edu-list { margin: .4rem 0 0 .3rem; padding-left: 1rem; gap: .3rem; }
+    #achievements .edu-list li::before { left: -1.4rem; top: .35rem; width: .7rem; height: .7rem; }
+    #achievements .edu-list li.edu-sub::before { left: -1.4rem; }
+    #achievements .edu-level { font-size: .95rem; }
+    #achievements .edu-years { font-size: .9rem; margin-left: .3rem; }
+    #achievements .edu-school { font-size: .9rem; }
+}
