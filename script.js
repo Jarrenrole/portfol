@@ -275,7 +275,8 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         lbCap.textContent = p.dataset.caption || "";
     };
     const open = p => {
-        list = [...p.closest(".ach-panel").querySelectorAll(".proof:not(.no-photo)")];
+        // all achievement photos on the page, across every panel
+        list = [...document.querySelectorAll("#achievements .proof:not(.no-photo)")];
         idx = list.indexOf(p);
         lastFocus = document.activeElement;
         lb.classList.toggle("single", list.length < 2);
@@ -310,4 +311,119 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         else return;
         e.stopImmediatePropagation();
     }, true);
+})();
+
+/* ===== 8. FAMILY & FRIENDS: placeholder if a photo file is missing ===== */
+document.querySelectorAll(".fam-photo img").forEach(img => {
+    const fail = () => img.closest(".fam-photo").classList.add("no-photo");
+    if (img.complete && img.naturalWidth === 0) fail();
+    else img.addEventListener("error", fail, { once: true });
+});
+
+/* ===== 9. AUTO-FIT (everything always fits the screen, never scrolls) ===== */
+(() => {
+    const root = document.documentElement;
+    const MIN = 0.5;                                  // smallest allowed shrink (50%)
+    const main = document.querySelector("main");
+    const typing = document.querySelector(".multiple-text");
+    const longest = (typeof roles !== "undefined" ? roles : []).reduce((a, b) => (b.length > a.length ? b : a), "");
+    let base = 10, raf = 0;
+
+    // Does the active page fit at this scale?
+    const fits = (sec, s) => {
+        root.style.fontSize = base * s + "px";
+        const cs = getComputedStyle(sec);
+        const r = sec.getBoundingClientRect();
+        const top = r.top + parseFloat(cs.paddingTop);
+        const bottom = r.bottom - parseFloat(cs.paddingBottom);
+
+        // 1. main blocks must sit inside the page
+        for (const c of sec.children) {
+            const b = c.getBoundingClientRect();
+            if (!b.height) continue;
+            if (b.top < top - 2 || b.bottom > bottom + 2 || b.left < r.left - 2 || b.right > r.right + 2) return false;
+        }
+        // 2. no card / list may clip its own content
+        for (const el of sec.querySelectorAll(".card, .edu-card, .edu-list, .fam-body, .ach-body")) {
+            if (el.getClientRects().length && el.scrollHeight > el.clientHeight + 1) return false;
+        }
+        // 3. photos must stay big enough to see
+        for (const p of sec.querySelectorAll(".proof, .fam-photo")) {
+            if (p.getClientRects().length && p.clientHeight < 70) return false;
+        }
+        return true;
+    };
+
+    const solve = sec => {
+        if (fits(sec, 1)) return 1;
+        if (!fits(sec, MIN)) return MIN;
+        let lo = MIN, hi = 1;
+        for (let i = 0; i < 8; i++) {
+            const mid = (lo + hi) / 2;
+            fits(sec, mid) ? (lo = mid) : (hi = mid);
+        }
+        return lo;
+    };
+
+    const apply = () => {
+        raf = 0;
+        const sec = document.querySelector("main > section.active");
+        if (!sec) return;
+
+        root.style.fontSize = "";
+        base = parseFloat(getComputedStyle(root).fontSize) || 10;
+        root.classList.add("is-measuring");
+
+        // measure with the longest typing text so the layout never jumps later
+        const saved = typing ? typing.textContent : "";
+        if (typing && longest) typing.textContent = longest;
+        const scale = solve(sec);
+        if (typing) typing.textContent = saved;
+
+        root.classList.remove("is-measuring");
+        root.style.fontSize = base * scale + "px";
+    };
+
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
+
+    // re-fit when the page changes, the screen changes, or images/fonts finish loading
+    new MutationObserver(schedule).observe(main, { attributes: true, attributeFilter: ["class"], subtree: true });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("orientationchange", schedule);
+    window.addEventListener("load", schedule);
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", schedule);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+
+    // hard guarantee: pages can never be scrolled, not even by focus or keyboard
+    document.querySelectorAll("main, main > section").forEach(el =>
+        el.addEventListener("scroll", () => { el.scrollTop = 0; el.scrollLeft = 0; }, { passive: true })
+    );
+
+    schedule();
+})();
+
+/* ===== 10. PROFILE ORBIT (rotating ovals around the profile photo only) ===== */
+(() => {
+    const wrap = document.querySelector(".home-img");
+    const photo = wrap && wrap.querySelector(".image-ring");
+    if (!wrap || !photo || wrap.querySelector(".orbit")) return;
+
+    const orbits = [
+        { "--tilt": "16deg",  "--os": "136%", "--oy": "54%", "--dur": "11s", "--dir": "normal"  },
+        { "--tilt": "-24deg", "--os": "114%", "--oy": "58%", "--dur": "15s", "--dir": "reverse" }
+    ];
+
+    const make = (side, vars) => {
+        const o = document.createElement("div");
+        o.className = "orbit " + side;
+        o.setAttribute("aria-hidden", "true");
+        Object.entries(vars).forEach(([k, v]) => o.style.setProperty(k, v));
+        o.innerHTML = '<span class="orbit-ring"><span class="orbit-dot"></span></span>';
+        return o;
+    };
+
+    orbits.forEach(v => {
+        wrap.insertBefore(make("back", v), photo);   // far half goes behind the photo
+        wrap.appendChild(make("front", v));          // near half goes in front
+    });
 })();
