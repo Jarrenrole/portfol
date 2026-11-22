@@ -25,7 +25,6 @@ window.addEventListener("resize", () => { if (window.innerWidth > 1000) setMenu(
 /* ===== 3. SECTION NAVIGATION ===== */
 const ids = [...sections].map(s => s.id);
 
-// Stagger delay for the cards on each page
 sections.forEach(s => s.querySelectorAll(".card").forEach((c, i) => c.style.setProperty("--i", i)));
 
 function showSection(id, updateURL = true) {
@@ -44,7 +43,6 @@ function showSection(id, updateURL = true) {
         active ? link.setAttribute("aria-current", "page") : link.removeAttribute("aria-current");
     });
 
-    // Show "Back to Home" everywhere except on Home
     document.body.dataset.page = id;
 
     setMenu(false);
@@ -64,7 +62,6 @@ document.addEventListener("click", e => {
 
 window.addEventListener("popstate", () => showSection(location.hash.slice(1) || "home", false));
 
-// Left / right arrow keys move between sections
 document.addEventListener("keydown", e => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
     const current = ids.indexOf(document.querySelector("main section.active")?.id);
@@ -74,7 +71,7 @@ document.addEventListener("keydown", e => {
 
 showSection(location.hash.slice(1) || "home", false);
 
-// Swipe left / right on touch screens to change pages
+// Swipe left / right on touch screens
 let touchX = 0, touchY = 0;
 const viewport = document.querySelector("main");
 
@@ -92,7 +89,7 @@ viewport.addEventListener("touchend", e => {
     if (next >= 0 && next < ids.length) showSection(ids[next]);
 }, { passive: true });
 
-// If the profile photo is missing, show initials instead of a broken image
+// Profile photo fallback (initials)
 const profileImg = document.querySelector(".image-ring img");
 if (profileImg) {
     const useFallback = () => {
@@ -101,7 +98,6 @@ if (profileImg) {
             '<text x="50%" y="58%" font-family="Poppins,sans-serif" font-size="74" font-weight="800" fill="#E50935" text-anchor="middle">JR</text></svg>'
         );
     };
-    // The error may already have happened before this script ran
     if (profileImg.complete && profileImg.naturalWidth === 0) useFallback();
     else profileImg.addEventListener("error", useFallback, { once: true });
 }
@@ -157,7 +153,6 @@ if (canvas) {
     function draw() {
         ctx.clearRect(0, 0, w, h);
 
-        // Very small red glow following the cursor
         if (mouse.x >= 0 && mouse.y >= 0) {
             const glow = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 20);
             glow.addColorStop(0, "rgba(229, 9, 53, 0.20)");
@@ -183,7 +178,6 @@ if (canvas) {
             }
         }
 
-        // Lines from nearby particles to the cursor
         particles.forEach(p => {
             const d = Math.hypot(p.x - mouse.x, p.y - mouse.y);
             if (d < 150) {
@@ -243,7 +237,6 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 /* ===== 7. ACHIEVEMENTS: TABS + PHOTO PROOF VIEWER ===== */
 (() => {
-    /* Achievement tabs */
     const tabs = [...document.querySelectorAll(".ach-tab")];
     const panels = [...document.querySelectorAll(".ach-panel")];
     tabs.forEach(tab => tab.addEventListener("click", () => {
@@ -255,14 +248,12 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         panels.forEach(p => { p.hidden = p.id !== tab.dataset.panel; p.scrollTop = 0; });
     }));
 
-    /* Missing photo -> show "Add photo proof" placeholder */
     document.querySelectorAll(".proof img").forEach(img => {
         const fail = () => img.closest(".proof").classList.add("no-photo");
         if (img.complete && img.naturalWidth === 0) fail();
         else img.addEventListener("error", fail, { once: true });
     });
 
-    /* Lightbox */
     const lb = document.getElementById("lightbox");
     const lbImg = lb.querySelector("img");
     const lbCap = lb.querySelector("figcaption");
@@ -275,7 +266,6 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         lbCap.textContent = p.dataset.caption || "";
     };
     const open = p => {
-        // all achievement photos on the page, across every panel
         list = [...document.querySelectorAll("#achievements .proof:not(.no-photo)")];
         idx = list.indexOf(p);
         lastFocus = document.activeElement;
@@ -302,7 +292,6 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         else if (e.target.closest(".lb-next")) step(1);
     });
 
-    // capture phase: stops the page-switching arrow keys while the viewer is open
     window.addEventListener("keydown", e => {
         if (!lb.classList.contains("open")) return;
         if (e.key === "Escape") close();
@@ -313,23 +302,57 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     }, true);
 })();
 
-/* ===== 8. FAMILY & FRIENDS: placeholder if a photo file is missing ===== */
+/* ===== 8. FAMILY & FRIENDS: placeholder if a photo is missing ===== */
 document.querySelectorAll(".fam-photo img").forEach(img => {
     const fail = () => img.closest(".fam-photo").classList.add("no-photo");
     if (img.complete && img.naturalWidth === 0) fail();
     else img.addEventListener("error", fail, { once: true });
 });
 
+// Fire frames: wavy, flickering flame border (SVG turbulence + displacement)
+(() => {
+    const filters = [1, 2, 3, 4].map(i => `
+        <filter id="fire${i}" x="-60%" y="-60%" width="220%" height="220%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.035" numOctaves="2" seed="${i * 7}" result="n">
+                <animate attributeName="baseFrequency" dur="${4 + i}s" values="0.02 0.035;0.03 0.06;0.02 0.035" repeatCount="indefinite"/>
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G">
+                <animate attributeName="scale" dur="${1.5 + i * .35}s" values="22;38;26;40;22" repeatCount="indefinite"/>
+            </feDisplacementMap>
+        </filter>`).join("");
+
+    document.body.insertAdjacentHTML("beforeend",
+        `<svg id="fire-defs" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${filters}</defs></svg>`);
+
+    if (reduceMotion.matches) document.querySelectorAll("#fire-defs animate").forEach(a => a.remove());
+
+    document.querySelectorAll(".fam-photo").forEach((f, n) => {
+        const k = (n % 4) + 1;
+        const fire = document.createElement("span");
+        fire.className = "fire-frame";
+        fire.style.filter = `url(#fire${k})`;
+        f.prepend(fire);
+
+        [[18, "-1rem", 0], [48, ".4rem", .9], [76, "1.2rem", 1.7]].forEach(([left, x, d]) => {
+            const h = document.createElement("i");
+            h.className = "bx bxs-heart float-heart";
+            h.style.left = left + "%";
+            h.style.setProperty("--x", x);
+            h.style.setProperty("--d", d + "s");
+            f.appendChild(h);
+        });
+    });
+})();
+
 /* ===== 9. AUTO-FIT (everything always fits the screen, never scrolls) ===== */
 (() => {
     const root = document.documentElement;
-    const MIN = 0.5;                                  // smallest allowed shrink (50%)
+    const MIN = 0.5;
     const main = document.querySelector("main");
     const typing = document.querySelector(".multiple-text");
-    const longest = (typeof roles !== "undefined" ? roles : []).reduce((a, b) => (b.length > a.length ? b : a), "");
+    const longest = roles.reduce((a, b) => (b.length > a.length ? b : a), "");
     let base = 10, raf = 0;
 
-    // Does the active page fit at this scale?
     const fits = (sec, s) => {
         root.style.fontSize = base * s + "px";
         const cs = getComputedStyle(sec);
@@ -337,17 +360,14 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
         const top = r.top + parseFloat(cs.paddingTop);
         const bottom = r.bottom - parseFloat(cs.paddingBottom);
 
-        // 1. main blocks must sit inside the page
         for (const c of sec.children) {
             const b = c.getBoundingClientRect();
             if (!b.height) continue;
             if (b.top < top - 2 || b.bottom > bottom + 2 || b.left < r.left - 2 || b.right > r.right + 2) return false;
         }
-        // 2. no card / list may clip its own content
         for (const el of sec.querySelectorAll(".card, .edu-card, .edu-list, .fam-body, .ach-body")) {
             if (el.getClientRects().length && el.scrollHeight > el.clientHeight + 1) return false;
         }
-        // 3. photos must stay big enough to see
         for (const p of sec.querySelectorAll(".proof, .fam-photo")) {
             if (p.getClientRects().length && p.clientHeight < 70) return false;
         }
@@ -374,7 +394,6 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
         base = parseFloat(getComputedStyle(root).fontSize) || 10;
         root.classList.add("is-measuring");
 
-        // measure with the longest typing text so the layout never jumps later
         const saved = typing ? typing.textContent : "";
         if (typing && longest) typing.textContent = longest;
         const scale = solve(sec);
@@ -386,7 +405,6 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
 
     const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
 
-    // re-fit when the page changes, the screen changes, or images/fonts finish loading
     new MutationObserver(schedule).observe(main, { attributes: true, attributeFilter: ["class"], subtree: true });
     window.addEventListener("resize", schedule);
     window.addEventListener("orientationchange", schedule);
@@ -394,7 +412,6 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
     if (window.visualViewport) window.visualViewport.addEventListener("resize", schedule);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
 
-    // hard guarantee: pages can never be scrolled, not even by focus or keyboard
     document.querySelectorAll("main, main > section").forEach(el =>
         el.addEventListener("scroll", () => { el.scrollTop = 0; el.scrollLeft = 0; }, { passive: true })
     );
@@ -402,28 +419,170 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
     schedule();
 })();
 
-/* ===== 10. PROFILE ORBIT (rotating ovals around the profile photo only) ===== */
+/* ===== 10. PROFILE ORBIT (2 flat rings that fit the photo) ===== */
 (() => {
     const wrap = document.querySelector(".home-img");
     const photo = wrap && wrap.querySelector(".image-ring");
     if (!wrap || !photo || wrap.querySelector(".orbit")) return;
 
-    const orbits = [
-        { "--tilt": "16deg",  "--os": "136%", "--oy": "54%", "--dur": "11s", "--dir": "normal"  },
-        { "--tilt": "-24deg", "--os": "114%", "--oy": "58%", "--dur": "15s", "--dir": "reverse" }
-    ];
-
-    const make = (side, vars) => {
+    [["o1", "14s", "normal"], ["o2", "19s", "reverse"]].forEach(([cls, dur, dir]) => {
         const o = document.createElement("div");
-        o.className = "orbit " + side;
+        o.className = "orbit " + cls;
         o.setAttribute("aria-hidden", "true");
-        Object.entries(vars).forEach(([k, v]) => o.style.setProperty(k, v));
-        o.innerHTML = '<span class="orbit-ring"><span class="orbit-dot"></span></span>';
-        return o;
+        o.style.setProperty("--dur", dur);
+        o.style.setProperty("--dir", dir);
+        o.innerHTML = "<i></i>";
+        wrap.insertBefore(o, photo);
+    });
+})();
+
+/* ===== 11. PRELOADER ===== */
+(() => {
+    const pre = document.createElement("div");
+    pre.className = "preloader";
+    pre.innerHTML = "<b>ROLE<span>Ⓧ</span></b>";
+    document.body.appendChild(pre);
+    const hide = () => setTimeout(() => {
+        pre.classList.add("done");
+        document.body.classList.add("ready");
+        setTimeout(() => pre.remove(), 800);
+    }, 700);
+    document.readyState === "complete" ? hide() : window.addEventListener("load", hide);
+})();
+
+/* ===== 12. CARD SPOTLIGHT ===== */
+document.addEventListener("pointermove", e => {
+    const card = e.target.closest && e.target.closest(".card");
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty("--mx", e.clientX - r.left + "px");
+    card.style.setProperty("--my", e.clientY - r.top + "px");
+}, { passive: true });
+
+/* ===== 13. 3D TILT ON THE PROFILE PHOTO ===== */
+(() => {
+    const home = document.querySelector("#home");
+    const img = document.querySelector(".home-img");
+    if (!home || !img || reduceMotion.matches || matchMedia("(hover: none)").matches) return;
+
+    home.addEventListener("pointermove", e => {
+        const r = home.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        img.style.transform = `perspective(900px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg)`;
+    });
+    home.addEventListener("pointerleave", () => { img.style.transform = ""; });
+})();
+
+/* ===== 14. BUTTON RIPPLE ===== */
+document.addEventListener("click", e => {
+    const btn = e.target.closest(".btn");
+    if (!btn) return;
+    const r = btn.getBoundingClientRect();
+    const dot = document.createElement("span");
+    dot.className = "ripple";
+    dot.style.left = e.clientX - r.left + "px";
+    dot.style.top = e.clientY - r.top + "px";
+    btn.appendChild(dot);
+    setTimeout(() => dot.remove(), 650);
+});
+
+/* ===== 16. MAGNETIC SOCIAL ICONS ===== */
+document.querySelectorAll(".social-media a").forEach(a => {
+    if (reduceMotion.matches) return;
+    a.addEventListener("pointermove", e => {
+        const r = a.getBoundingClientRect();
+        a.style.translate = `${(e.clientX - r.left - r.width / 2) * .3}px ${(e.clientY - r.top - r.height / 2) * .3}px`;
+    });
+    a.addEventListener("pointerleave", () => { a.style.translate = ""; });
+});
+
+/* ===== 17. RED SPRINKLES FOLLOW THE CURSOR ===== */
+(() => {
+    if (reduceMotion.matches || matchMedia("(hover: none)").matches) return;
+
+    const cv = document.createElement("canvas");
+    cv.id = "sprinkles";
+    cv.setAttribute("aria-hidden", "true");
+    document.body.appendChild(cv);
+    const c = cv.getContext("2d");
+    let W = 0, H = 0, running = false, lastX = 0, lastY = 0;
+    const bits = [];
+    const colors = ["#E50935", "#FF294F", "#FF6B83", "#FF8FA3", "#A00020", "#FFFFFF"];
+
+    const size = () => {
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        W = innerWidth; H = innerHeight;
+        cv.width = W * dpr; cv.height = H * dpr;
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    size();
+    addEventListener("resize", size);
+
+    const spawn = (x, y, n) => {
+        for (let i = 0; i < n; i++) {
+            bits.push({
+                x, y,
+                vx: (Math.random() - .5) * 2.6,
+                vy: (Math.random() - .5) * 2.6 - .6,
+                rot: Math.random() * Math.PI,
+                vr: (Math.random() - .5) * .4,
+                len: Math.random() * 6 + 4,        // sprinkle length
+                th: Math.random() * 1.6 + 1.6,     // sprinkle thickness
+                life: 1,
+                decay: Math.random() * .014 + .016,
+                col: colors[(Math.random() * colors.length) | 0]
+            });
+        }
+        if (!running) { running = true; requestAnimationFrame(loop); }
     };
 
-    orbits.forEach(v => {
-        wrap.insertBefore(make("back", v), photo);   // far half goes behind the photo
-        wrap.appendChild(make("front", v));          // near half goes in front
+    addEventListener("pointermove", e => {
+        const d = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+        lastX = e.clientX; lastY = e.clientY;
+        if (d > 3) spawn(e.clientX, e.clientY, d > 25 ? 3 : 2);
+    }, { passive: true });
+
+    addEventListener("pointerdown", e => spawn(e.clientX, e.clientY, 14));
+
+    function loop() {
+        c.clearRect(0, 0, W, H);
+        for (let i = bits.length - 1; i >= 0; i--) {
+            const b = bits[i];
+            b.x += b.vx; b.y += b.vy; b.vy += .06; b.vx *= .985;
+            b.rot += b.vr; b.life -= b.decay;
+            if (b.life <= 0) { bits.splice(i, 1); continue; }
+            c.save();
+            c.translate(b.x, b.y);
+            c.rotate(b.rot);
+            c.globalAlpha = b.life;
+            c.shadowBlur = 8;
+            c.shadowColor = "#E50935";
+            c.fillStyle = b.col;
+            c.beginPath();
+            c.roundRect(-b.len / 2, -b.th / 2, b.len, b.th, b.th / 2);
+            c.fill();
+            c.restore();
+        }
+        if (bits.length) requestAnimationFrame(loop);
+        else { running = false; c.clearRect(0, 0, W, H); }
+    }
+})();
+
+/* ===== 18. FAMILY CARDS: 3D TILT ===== */
+(() => {
+    if (reduceMotion.matches || matchMedia("(hover: none)").matches) return;
+    document.querySelectorAll(".fam-card").forEach(card => {
+        card.addEventListener("pointermove", e => {
+            const r = card.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width - .5;
+            const y = (e.clientY - r.top) / r.height - .5;
+            card.style.setProperty("--ry", x * 10 + "deg");
+            card.style.setProperty("--rx", -y * 10 + "deg");
+        });
+        card.addEventListener("pointerleave", () => {
+            card.style.removeProperty("--rx");
+            card.style.removeProperty("--ry");
+        });
     });
 })();
