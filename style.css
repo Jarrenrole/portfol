@@ -721,3 +721,110 @@ html.is-measuring *, html.is-measuring *::before, html.is-measuring *::after {
     .fam-body::before { margin-bottom: .6rem; }
     .fam-body h3 { font-size: 1.3rem; }
 }
+
+/* =====================================================================
+   18. UPGRADES: NAV (3 links only), BIGGER SQUARE PROFILE, EXTRA POLISH
+   ===================================================================== */
+
+/* ----- A. NAVIGATION: only 3 links, always visible, upper right ----- */
+.navbar a[hidden] { display: inline-block !important; }
+.navbar a[href="#home"] { display: none !important; }
+
+@media (min-width: 1001px) {
+    .navbar {
+        gap: .6rem; padding: .5rem;
+        border: 1px solid var(--line); border-radius: 5rem;
+        background: rgba(255, 255, 255, .04);
+        box-shadow: inset 0 0 20px rgba(229, 9, 53, .06);
+    }
+    .navbar a {
+        padding: .9rem 1.8rem; border: 1px solid transparent; border-radius: 5rem;
+        transition: color .3s, background .3s, box-shadow .3s, transform .3s;
+    }
+    .navbar a::after { display: none; }
+    .navbar a:hover { color: #fff; background: rgba(229, 9, 53, .16); transform: translateY(-2px); }
+    .navbar a.active {
+        color: #fff; text-shadow: none;
+        background: var(--grad);
+        box-shadow: 0 0 20px rgba(229, 9, 53, .5);
+    }
+}
+
+/* ----- B. PROFILE PHOTO: bigger, square-cornered, head to toe ----- */
+.home-img {
+    width: auto; height: 100%; max-height: 62rem;
+    aspect-ratio: 3 / 4;
+}
+.orbit { display: none !important; }
+.image-glow { inset: 6%; border-radius: 3rem; filter: blur(60px); }
+.image-ring {
+    width: 100%; height: 100%; padding: .8rem;
+    border-radius: 2.8rem;
+    background: linear-gradient(120deg, #780018, #FF6B83, #E50935, #FF294F, #780018);
+    background-size: 220% 220%;
+    animation: ringFlow 6s ease-in-out infinite alternate;
+    box-shadow: 0 0 30px rgba(229, 9, 53, .55), 0 0 90px rgba(229, 9, 53, .25);
+}
+.image-ring img {
+    border-radius: 2.1rem; border: 3px solid #1B1115;
+    object-fit: contain;
+    object-position: center;
+    background: radial-gradient(circle at 50% 30%, #2a0f17, #120609);
+}
+.tag-top { top: 10%; right: -9%; }
+.tag-bottom { bottom: 10%; left: -9%; }
+@keyframes ringFlow { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+
+@media (max-width: 1000px) {
+    .home-img { height: min(36vh, 32rem); width: auto; }
+    .tag-top { right: -14%; }
+    .tag-bottom { left: -14%; }
+}
+@media (max-width: 1000px) and (max-height: 700px) {
+    .home-img { height: min(28vh, 24rem); }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+    .home-img { height: 100%; max-height: 34rem; width: auto; }
+}
+
+/* ----- C. EXTRA POLISH ----- */
+body::after {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .028) 1px, transparent 1px);
+    background-size: 5rem 5rem;
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 15%, transparent 75%);
+            mask-image: radial-gradient(circle at 50% 50%, #000 15%, transparent 75%);
+}
+
+.card {
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 10px 30px rgba(0, 0, 0, .25);
+}
+
+.home h1 { text-shadow: 0 0 40px rgba(229, 9, 53, .18); }
+.home-description {
+    padding-left: 1.4rem;
+    border-left: 3px solid var(--main);
+    color: #E6D8DC;
+}
+.eyebrow {
+    width: fit-content; padding: .6rem 1.4rem;
+    border: 1px solid rgba(229, 9, 53, .35); border-radius: 5rem;
+    background: rgba(229, 9, 53, .08);
+}
+@media (max-width: 1000px) { .eyebrow { margin-inline: auto; } .home-description { text-align: left; } }
+
+.tile:hover { border-color: rgba(255, 41, 79, .7); }
+.tile b { letter-spacing: .01rem; }
+
+.page h2 span { text-shadow: 0 0 28px rgba(229, 9, 53, .45); }
+.label { letter-spacing: .12rem; text-transform: uppercase; font-size: 1.15rem; }
+
+.footer { box-shadow: 0 -1px 30px rgba(229, 9, 53, .08); }
+.footer::before {
+    content: ""; position: absolute; top: -1px; left: 0; width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--main), transparent); opacity: .5;
+}
+
