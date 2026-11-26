@@ -1,3 +1,4 @@
+
 /* ===== 1. ELEMENTS ===== */
 const menuIcon = document.querySelector("#menu-icon");
 const navbar = document.querySelector("#navbar");
@@ -37,16 +38,18 @@ function showSection(id, updateURL = true) {
         s.setAttribute("aria-hidden", String(!active));
     });
 
+    /* Hide the currently active page from navigation */
     navLinks.forEach(link => {
         const active = link.getAttribute("href") === `#${id}`;
+        link.hidden = active;
         link.classList.toggle("active", active);
-        active ? link.setAttribute("aria-current", "page") : link.removeAttribute("aria-current");
+        link.removeAttribute("aria-current");
     });
 
     document.body.dataset.page = id;
-
     setMenu(false);
     target.scrollTop = 0;
+
     document.title = `${id === "home" ? "Jarren Role" : target.querySelector("h2")?.textContent} | Portfolio`;
 
     if (updateURL && location.hash !== `#${id}`) history.pushState({ id }, "", `#${id}`);
@@ -131,20 +134,25 @@ if (canvas) {
     const ctx = canvas.getContext("2d");
     let particles = [], w = 0, h = 0, frame = null;
     const mouse = { x: -999, y: -999 };
+
     window.addEventListener("pointermove", e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
     window.addEventListener("pointerleave", () => { mouse.x = mouse.y = -999; });
 
     function resize() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        w = window.innerWidth; h = window.innerHeight;
-        canvas.width = w * dpr; canvas.height = h * dpr;
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         const count = Math.min(65, Math.floor(w / 17));
         particles = Array.from({ length: count }, () => ({
-            x: Math.random() * w, y: Math.random() * h,
+            x: Math.random() * w,
+            y: Math.random() * h,
             r: Math.random() * 2 + .6,
-            vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45,
+            vx: (Math.random() - .5) * .45,
+            vy: (Math.random() - .5) * .45,
             a: Math.random() * .55 + .2
         }));
         draw();
@@ -167,6 +175,7 @@ if (canvas) {
                 const dx = particles[i].x - particles[j].x;
                 const dy = particles[i].y - particles[j].y;
                 const d = Math.hypot(dx, dy);
+
                 if (d < 135) {
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x, particles[i].y);
@@ -192,23 +201,35 @@ if (canvas) {
 
         ctx.shadowBlur = 12;
         ctx.shadowColor = "#E50935";
+
         particles.forEach(p => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(255,65,100,${p.a})`;
             ctx.fill();
         });
+
         ctx.shadowBlur = 0;
     }
 
     function tick() {
         particles.forEach(p => {
-            const dx = p.x - mouse.x, dy = p.y - mouse.y, d = Math.hypot(dx, dy);
-            if (d < 110 && d > 0) { p.x += (dx / d) * 0.8; p.y += (dy / d) * 0.8; }
-            p.x += p.vx; p.y += p.vy;
+            const dx = p.x - mouse.x;
+            const dy = p.y - mouse.y;
+            const d = Math.hypot(dx, dy);
+
+            if (d < 110 && d > 0) {
+                p.x += (dx / d) * 0.8;
+                p.y += (dy / d) * 0.8;
+            }
+
+            p.x += p.vx;
+            p.y += p.vy;
+
             if (p.x < 0 || p.x > w) p.vx *= -1;
             if (p.y < 0 || p.y > h) p.vy *= -1;
         });
+
         draw();
         frame = requestAnimationFrame(tick);
     }
@@ -220,10 +241,12 @@ if (canvas) {
     }
 
     let resizeTimer;
+
     window.addEventListener("resize", () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => { resize(); start(); }, 120);
     });
+
     document.addEventListener("visibilitychange", start);
     reduceMotion.addEventListener("change", start);
 
@@ -239,13 +262,18 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 (() => {
     const tabs = [...document.querySelectorAll(".ach-tab")];
     const panels = [...document.querySelectorAll(".ach-panel")];
+
     tabs.forEach(tab => tab.addEventListener("click", () => {
         tabs.forEach(t => {
             const on = t === tab;
             t.classList.toggle("active", on);
             t.setAttribute("aria-selected", String(on));
         });
-        panels.forEach(p => { p.hidden = p.id !== tab.dataset.panel; p.scrollTop = 0; });
+
+        panels.forEach(p => {
+            p.hidden = p.id !== tab.dataset.panel;
+            p.scrollTop = 0;
+        });
     }));
 
     document.querySelectorAll(".proof img").forEach(img => {
@@ -255,6 +283,8 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     });
 
     const lb = document.getElementById("lightbox");
+    if (!lb) return;
+
     const lbImg = lb.querySelector("img");
     const lbCap = lb.querySelector("figcaption");
     let list = [], idx = 0, lastFocus = null;
@@ -265,6 +295,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         lbImg.alt = p.querySelector("img").alt;
         lbCap.textContent = p.dataset.caption || "";
     };
+
     const open = p => {
         list = [...document.querySelectorAll("#achievements .proof:not(.no-photo)")];
         idx = list.indexOf(p);
@@ -275,12 +306,17 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         lb.setAttribute("aria-hidden", "false");
         lb.querySelector(".lb-close").focus();
     };
+
     const close = () => {
         lb.classList.remove("open");
         lb.setAttribute("aria-hidden", "true");
-        lastFocus && lastFocus.focus();
+        if (lastFocus) lastFocus.focus();
     };
-    const step = d => { idx = (idx + d + list.length) % list.length; render(); };
+
+    const step = d => {
+        idx = (idx + d + list.length) % list.length;
+        render();
+    };
 
     document.querySelectorAll(".proof").forEach(p => p.addEventListener("click", () => {
         if (!p.classList.contains("no-photo")) open(p);
@@ -294,10 +330,12 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 
     window.addEventListener("keydown", e => {
         if (!lb.classList.contains("open")) return;
+
         if (e.key === "Escape") close();
         else if (e.key === "ArrowRight" && list.length > 1) step(1);
         else if (e.key === "ArrowLeft" && list.length > 1) step(-1);
         else return;
+
         e.stopImmediatePropagation();
     }, true);
 })();
@@ -309,115 +347,8 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
     else img.addEventListener("error", fail, { once: true });
 });
 
-// Fire frames: wavy, flickering flame border (SVG turbulence + displacement)
-(() => {
-    const filters = [1, 2, 3, 4].map(i => `
-        <filter id="fire${i}" x="-60%" y="-60%" width="220%" height="220%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.035" numOctaves="2" seed="${i * 7}" result="n">
-                <animate attributeName="baseFrequency" dur="${4 + i}s" values="0.02 0.035;0.03 0.06;0.02 0.035" repeatCount="indefinite"/>
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G">
-                <animate attributeName="scale" dur="${1.5 + i * .35}s" values="22;38;26;40;22" repeatCount="indefinite"/>
-            </feDisplacementMap>
-        </filter>`).join("");
-
-    document.body.insertAdjacentHTML("beforeend",
-        `<svg id="fire-defs" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${filters}</defs></svg>`);
-
-    if (reduceMotion.matches) document.querySelectorAll("#fire-defs animate").forEach(a => a.remove());
-
-    document.querySelectorAll(".fam-photo").forEach((f, n) => {
-        const k = (n % 4) + 1;
-        const fire = document.createElement("span");
-        fire.className = "fire-frame";
-        fire.style.filter = `url(#fire${k})`;
-        f.prepend(fire);
-
-        [[18, "-1rem", 0], [48, ".4rem", .9], [76, "1.2rem", 1.7]].forEach(([left, x, d]) => {
-            const h = document.createElement("i");
-            h.className = "bx bxs-heart float-heart";
-            h.style.left = left + "%";
-            h.style.setProperty("--x", x);
-            h.style.setProperty("--d", d + "s");
-            f.appendChild(h);
-        });
-    });
-})();
-
-/* ===== 9. AUTO-FIT (everything always fits the screen, never scrolls) ===== */
-(() => {
-    const root = document.documentElement;
-    const MIN = 0.5;
-    const main = document.querySelector("main");
-    const typing = document.querySelector(".multiple-text");
-    const longest = roles.reduce((a, b) => (b.length > a.length ? b : a), "");
-    let base = 10, raf = 0;
-
-    const fits = (sec, s) => {
-        root.style.fontSize = base * s + "px";
-        const cs = getComputedStyle(sec);
-        const r = sec.getBoundingClientRect();
-        const top = r.top + parseFloat(cs.paddingTop);
-        const bottom = r.bottom - parseFloat(cs.paddingBottom);
-
-        for (const c of sec.children) {
-            const b = c.getBoundingClientRect();
-            if (!b.height) continue;
-            if (b.top < top - 2 || b.bottom > bottom + 2 || b.left < r.left - 2 || b.right > r.right + 2) return false;
-        }
-        for (const el of sec.querySelectorAll(".card, .edu-card, .edu-list, .fam-body, .ach-body")) {
-            if (el.getClientRects().length && el.scrollHeight > el.clientHeight + 1) return false;
-        }
-        for (const p of sec.querySelectorAll(".proof, .fam-photo")) {
-            if (p.getClientRects().length && p.clientHeight < 70) return false;
-        }
-        return true;
-    };
-
-    const solve = sec => {
-        if (fits(sec, 1)) return 1;
-        if (!fits(sec, MIN)) return MIN;
-        let lo = MIN, hi = 1;
-        for (let i = 0; i < 8; i++) {
-            const mid = (lo + hi) / 2;
-            fits(sec, mid) ? (lo = mid) : (hi = mid);
-        }
-        return lo;
-    };
-
-    const apply = () => {
-        raf = 0;
-        const sec = document.querySelector("main > section.active");
-        if (!sec) return;
-
-        root.style.fontSize = "";
-        base = parseFloat(getComputedStyle(root).fontSize) || 10;
-        root.classList.add("is-measuring");
-
-        const saved = typing ? typing.textContent : "";
-        if (typing && longest) typing.textContent = longest;
-        const scale = solve(sec);
-        if (typing) typing.textContent = saved;
-
-        root.classList.remove("is-measuring");
-        root.style.fontSize = base * scale + "px";
-    };
-
-    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
-
-    new MutationObserver(schedule).observe(main, { attributes: true, attributeFilter: ["class"], subtree: true });
-    window.addEventListener("resize", schedule);
-    window.addEventListener("orientationchange", schedule);
-    window.addEventListener("load", schedule);
-    if (window.visualViewport) window.visualViewport.addEventListener("resize", schedule);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
-
-    document.querySelectorAll("main, main > section").forEach(el =>
-        el.addEventListener("scroll", () => { el.scrollTop = 0; el.scrollLeft = 0; }, { passive: true })
-    );
-
-    schedule();
-})();
+/* ===== 9. RESPONSIVE LAYOUT ===== */
+/* Natural sizing replaces the old auto-fit feature that shrank the whole page. */
 
 /* ===== 10. PROFILE ORBIT (2 flat rings that fit the photo) ===== */
 (() => {
@@ -442,11 +373,13 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
     pre.className = "preloader";
     pre.innerHTML = "<b>ROLE<span>Ⓧ</span></b>";
     document.body.appendChild(pre);
+
     const hide = () => setTimeout(() => {
         pre.classList.add("done");
         document.body.classList.add("ready");
         setTimeout(() => pre.remove(), 800);
     }, 700);
+
     document.readyState === "complete" ? hide() : window.addEventListener("load", hide);
 })();
 
@@ -454,6 +387,7 @@ document.querySelectorAll(".fam-photo img").forEach(img => {
 document.addEventListener("pointermove", e => {
     const card = e.target.closest && e.target.closest(".card");
     if (!card) return;
+
     const r = card.getBoundingClientRect();
     card.style.setProperty("--mx", e.clientX - r.left + "px");
     card.style.setProperty("--my", e.clientY - r.top + "px");
@@ -463,6 +397,7 @@ document.addEventListener("pointermove", e => {
 (() => {
     const home = document.querySelector("#home");
     const img = document.querySelector(".home-img");
+
     if (!home || !img || reduceMotion.matches || matchMedia("(hover: none)").matches) return;
 
     home.addEventListener("pointermove", e => {
@@ -471,30 +406,39 @@ document.addEventListener("pointermove", e => {
         const y = (e.clientY - r.top) / r.height - .5;
         img.style.transform = `perspective(900px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg)`;
     });
-    home.addEventListener("pointerleave", () => { img.style.transform = ""; });
+
+    home.addEventListener("pointerleave", () => {
+        img.style.transform = "";
+    });
 })();
 
 /* ===== 14. BUTTON RIPPLE ===== */
 document.addEventListener("click", e => {
     const btn = e.target.closest(".btn");
     if (!btn) return;
+
     const r = btn.getBoundingClientRect();
     const dot = document.createElement("span");
     dot.className = "ripple";
     dot.style.left = e.clientX - r.left + "px";
     dot.style.top = e.clientY - r.top + "px";
     btn.appendChild(dot);
+
     setTimeout(() => dot.remove(), 650);
 });
 
 /* ===== 16. MAGNETIC SOCIAL ICONS ===== */
 document.querySelectorAll(".social-media a").forEach(a => {
     if (reduceMotion.matches) return;
+
     a.addEventListener("pointermove", e => {
         const r = a.getBoundingClientRect();
         a.style.translate = `${(e.clientX - r.left - r.width / 2) * .3}px ${(e.clientY - r.top - r.height / 2) * .3}px`;
     });
-    a.addEventListener("pointerleave", () => { a.style.translate = ""; });
+
+    a.addEventListener("pointerleave", () => {
+        a.style.translate = "";
+    });
 });
 
 /* ===== 17. RED SPRINKLES FOLLOW THE CURSOR ===== */
@@ -505,6 +449,7 @@ document.querySelectorAll(".social-media a").forEach(a => {
     cv.id = "sprinkles";
     cv.setAttribute("aria-hidden", "true");
     document.body.appendChild(cv);
+
     const c = cv.getContext("2d");
     let W = 0, H = 0, running = false, lastX = 0, lastY = 0;
     const bits = [];
@@ -512,10 +457,13 @@ document.querySelectorAll(".social-media a").forEach(a => {
 
     const size = () => {
         const dpr = Math.min(devicePixelRatio || 1, 2);
-        W = innerWidth; H = innerHeight;
-        cv.width = W * dpr; cv.height = H * dpr;
+        W = innerWidth;
+        H = innerHeight;
+        cv.width = W * dpr;
+        cv.height = H * dpr;
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
+
     size();
     addEventListener("resize", size);
 
@@ -527,19 +475,24 @@ document.querySelectorAll(".social-media a").forEach(a => {
                 vy: (Math.random() - .5) * 2.6 - .6,
                 rot: Math.random() * Math.PI,
                 vr: (Math.random() - .5) * .4,
-                len: Math.random() * 6 + 4,        // sprinkle length
-                th: Math.random() * 1.6 + 1.6,     // sprinkle thickness
+                len: Math.random() * 6 + 4,
+                th: Math.random() * 1.6 + 1.6,
                 life: 1,
                 decay: Math.random() * .014 + .016,
                 col: colors[(Math.random() * colors.length) | 0]
             });
         }
-        if (!running) { running = true; requestAnimationFrame(loop); }
+
+        if (!running) {
+            running = true;
+            requestAnimationFrame(loop);
+        }
     };
 
     addEventListener("pointermove", e => {
         const d = Math.hypot(e.clientX - lastX, e.clientY - lastY);
-        lastX = e.clientX; lastY = e.clientY;
+        lastX = e.clientX;
+        lastY = e.clientY;
         if (d > 3) spawn(e.clientX, e.clientY, d > 25 ? 3 : 2);
     }, { passive: true });
 
@@ -547,11 +500,21 @@ document.querySelectorAll(".social-media a").forEach(a => {
 
     function loop() {
         c.clearRect(0, 0, W, H);
+
         for (let i = bits.length - 1; i >= 0; i--) {
             const b = bits[i];
-            b.x += b.vx; b.y += b.vy; b.vy += .06; b.vx *= .985;
-            b.rot += b.vr; b.life -= b.decay;
-            if (b.life <= 0) { bits.splice(i, 1); continue; }
+            b.x += b.vx;
+            b.y += b.vy;
+            b.vy += .06;
+            b.vx *= .985;
+            b.rot += b.vr;
+            b.life -= b.decay;
+
+            if (b.life <= 0) {
+                bits.splice(i, 1);
+                continue;
+            }
+
             c.save();
             c.translate(b.x, b.y);
             c.rotate(b.rot);
@@ -564,25 +527,72 @@ document.querySelectorAll(".social-media a").forEach(a => {
             c.fill();
             c.restore();
         }
+
         if (bits.length) requestAnimationFrame(loop);
-        else { running = false; c.clearRect(0, 0, W, H); }
+        else {
+            running = false;
+            c.clearRect(0, 0, W, H);
+        }
     }
 })();
 
-/* ===== 18. FAMILY CARDS: 3D TILT ===== */
+/* ===== 18. REVEAL ANIMATIONS ===== */
 (() => {
-    if (reduceMotion.matches || matchMedia("(hover: none)").matches) return;
-    document.querySelectorAll(".fam-card").forEach(card => {
-        card.addEventListener("pointermove", e => {
-            const r = card.getBoundingClientRect();
-            const x = (e.clientX - r.left) / r.width - .5;
-            const y = (e.clientY - r.top) / r.height - .5;
-            card.style.setProperty("--ry", x * 10 + "deg");
-            card.style.setProperty("--rx", -y * 10 + "deg");
-        });
-        card.addEventListener("pointerleave", () => {
-            card.style.removeProperty("--rx");
-            card.style.removeProperty("--ry");
-        });
+    if (reduceMotion.matches || !("IntersectionObserver" in window)) return;
+
+    const items = document.querySelectorAll(".tile, .ach-card, .edu-card, .fam-card");
+
+    items.forEach((item, index) => {
+        item.classList.add("reveal-item");
+        item.style.setProperty("--reveal-delay", `${(index % 4) * 75}ms`);
     });
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+
+    items.forEach(item => observer.observe(item));
 })();
+/* ===== 19. UPGRADE PACK  (paste this at the VERY BOTTOM of script.js) ===== */
+
+/* Page dots: quick jump between pages, highlights the current one */
+(() => {
+    const labels = {
+        "home": "Home",
+        "Personal-information": "Personal Information",
+        "achievements": "Achievements",
+        "my-family": "Family and Friends"
+    };
+
+    const wrap = document.createElement("nav");
+    wrap.className = "page-dots";
+    wrap.setAttribute("aria-label", "Pages");
+
+    ids.forEach(id => {
+        const a = document.createElement("a");
+        a.href = "#" + id;
+        a.title = labels[id] || id;
+        a.setAttribute("aria-label", a.title);
+        wrap.appendChild(a);
+    });
+
+    document.body.appendChild(wrap);
+
+    const sync = () => {
+        const cur = document.querySelector("main section.active")?.id;
+        [...wrap.children].forEach((a, i) => a.classList.toggle("active", ids[i] === cur));
+    };
+
+    new MutationObserver(sync).observe(document.querySelector("main"), {
+        subtree: true, attributes: true, attributeFilter: ["class"]
+    });
+    sync();
+})();
+
+/* Keep the upper-right menu to the 3 pages only (no Home), always visible */
+document.querySelectorAll('.navbar a[href="#home"]').forEach(a => a.remove());
